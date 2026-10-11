@@ -1,0 +1,17 @@
+LICENSE
+README.md
+pyproject.toml
+src/racegow/__init__.py
+src/racegow/config.py
+src/racegow/connectors.py
+src/racegow/exporting.py
+src/racegow/manufacturing.py
+src/racegow/track.py
+src/racegow_track_set.egg-info/PKG-INFO
+src/racegow_track_set.egg-info/SOURCES.txt
+src/racegow_track_set.egg-info/dependency_links.txt
+src/racegow_track_set.egg-info/requires.txt
+src/racegow_track_set.egg-info/top_level.txt
+tests/test_config.py
+tests/test_geometry.py
+tests/test_manufacturing.py

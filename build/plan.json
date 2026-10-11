@@ -1,0 +1,32 @@
+{
+  "bom": {
+    "4way": 6,
+    "5way": 2,
+    "elbow": 4,
+    "tee": 6
+  },
+  "connector": {
+    "diametral_clearance_mm": 0.4,
+    "socket_depth_mm": 26.0,
+    "socket_id_mm": 25.4,
+    "socket_od_mm": 29.4,
+    "wall_thickness_mm": 2
+  },
+  "gate": {
+    "ctc_mm": 625.0,
+    "racegow_min_ctc_mm": 609.5999999999999,
+    "scale_vs_24in": 1.0252624671916013
+  },
+  "pvc": {
+    "cut_kerf_mm": 2.0,
+    "offcut_per_full_stock_mm": 196.0,
+    "pieces_per_stock": 3,
+    "pipe_cut_length_mm": 600.0,
+    "pipe_od_mm": 25.0,
+    "segments_if_full_stock_cut": 21,
+    "segments_required": 20,
+    "spare_segments": 1,
+    "stock_length_mm": 2000.0,
+    "stock_pipes_required": 7
+  }
+}

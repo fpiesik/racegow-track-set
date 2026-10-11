@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "racegow-track-set"
+version = "0.3.0"
+description = "Parametric RaceGOW PVC track connectors built with build123d"
+readme = "README.md"
+requires-python = ">=3.11,<3.15"
+dependencies = [
+  "build123d==0.13.0",
+]
+
+[project.optional-dependencies]
+viewer = ["ocp-vscode>=4.1,<4.2", "watchfiles>=1.0,<2"]
+dev = ["pytest>=8.0"]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+addopts = "-q"

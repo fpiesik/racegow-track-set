@@ -1,0 +1,255 @@
+Metadata-Version: 2.4
+Name: racegow-track-set
+Version: 0.3.0
+Summary: Parametric RaceGOW PVC track connectors built with build123d
+Requires-Python: <3.15,>=3.11
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: build123d==0.13.0
+Provides-Extra: viewer
+Requires-Dist: ocp-vscode<4.2,>=4.1; extra == "viewer"
+Requires-Dist: watchfiles<2,>=1.0; extra == "viewer"
+Provides-Extra: dev
+Requires-Dist: pytest>=8.0; extra == "dev"
+Dynamic: license-file
+
+# RaceGOW PVC Track Set — build123d edition
+
+Python/build123d port of the earlier OpenSCAD RaceGOW connector project. It keeps the same CTC convention, connector topology and manufacturing logic, but moves the CAD model to a real BREP/OpenCascade workflow and exports both **STEP** and **STL**.
+
+The project targets **build123d 0.13.0**. build123d's official documentation describes it as a Pythonic BREP framework over Open Cascade, with algebraic object operations and STL/STEP export.
+
+## Core convention: Gate size is Center-to-Center
+
+`gate_ctc` always means the distance between connector centers.
+
+```text
+PVC cut length = gate_ctc - 2 × pipe_stop_offset
+```
+
+With the default 25 mm PVC and `pipe_stop_offset = pipe_od / 2`, the PVC piece is exactly **25 mm shorter than the CTC dimension**.
+
+## Default stock-optimized result
+
+The defaults are intentionally optimized for your 2000 mm stock pipes and a 2 mm cutter kerf:
+
+```text
+Gate CTC:                  690.33 mm
+PVC cut length:            665.33 mm
+Pieces per 2000 mm pipe:        3
+Stock pipes required:           7
+Segments produced:             21
+Segments required:             20
+Spare segments:                 1
+Offcut/full used stock:      0.00 mm (theoretical)
+```
+
+Always measure the real cutting kerf before committing all stock.
+
+## RaceGOW connector BOM
+
+- 4 × `elbow`
+- 6 × `tee`
+- 6 × `4way`
+- 2 × `5way`
+
+Optional: `cross` (four horizontal ports).
+
+Port topology:
+
+```text
+elbow : +X +Y
+tee   : -X +X +Y
+cross : -X +X -Y +Y
+4way  : -X +X +Y +Z
+5way  : -X +X -Y +Y +Z
+```
+
+## Why this structure is useful with Codex
+
+```text
+src/racegow/config.py         dimensions + derived values
+src/racegow/connectors.py     generic connector geometry
+src/racegow/track.py          complete-set preview assembly
+src/racegow/manufacturing.py  BOM + PVC cut plan
+src/racegow/exporting.py      STL/STEP validation + exports
+parts/                        tiny viewer wrappers
+scripts/build.py              one production command
+tests/                        numeric + geometry regression tests
+build/                        generated manufacturing/CAD outputs
+AGENTS.md                     rules for AI coding agents
+```
+
+The manufacturing calculations do not depend on build123d, so cut lists/BOMs can be generated even before CAD dependencies are installed.
+
+## Setup (VS Code + OCP CAD Viewer + Codex)
+
+The repository is configured for a project-local `.venv`. After cloning/opening
+the folder in VS Code, install the recommended extensions when VS Code offers
+them (`Python`, `Pylance`, `OCP CAD Viewer`, `Codex`).
+
+### One-command environment setup
+
+On Manjaro/Linux, run the VS Code task:
+
+```text
+Ctrl+Shift+P → Tasks: Run Task → RaceGOW: Setup .venv
+```
+
+Or from a terminal in the repository:
+
+```bash
+python scripts/setup_env.py
+```
+
+This creates `.venv/` and installs the project plus development/viewer extras.
+VS Code is configured to use:
+
+```text
+${workspaceFolder}/.venv/bin/python
+```
+
+If VS Code had an old interpreter cached, select it once with:
+
+```text
+Ctrl+Shift+P → Python: Select Interpreter → .venv/bin/python
+```
+
+The `viewer` extra installs `ocp_vscode` plus `watchfiles`; the latter powers
+the automatic live rebuild workflow. The OCP CAD Viewer extension and the
+`ocp_vscode` Python package should use the same major/minor release. This
+project currently targets OCP CAD Viewer / `ocp_vscode` 4.1.x.
+
+### Manual setup equivalent
+
+```bash
+python -m venv .venv
+. .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -e ".[dev,viewer]"
+```
+
+## Live viewing in OCP CAD Viewer
+
+The preferred development loop is a persistent watcher. Start the OCP CAD
+Viewer, then run:
+
+```text
+Ctrl+Shift+P → Tasks: Run Task → RaceGOW: Live view (choose part)
+```
+
+Choose `5way`, `4way`, `tee`, `elbow`, `cross`, or `fit_tests`. The task stays
+running. Whenever a Python file under `src/` or `scripts/` is saved, the model
+is rebuilt in a fresh Python child process and sent to the already-open viewer.
+The camera is kept between updates so you can rotate to an interesting detail
+and continue editing. Stop the watcher with `Ctrl+C` in its terminal.
+
+Terminal equivalent:
+
+```bash
+.venv/bin/python scripts/live_view.py 5way
+```
+
+For a single refresh instead of live mode:
+
+```text
+Ctrl+Shift+P → Tasks: Run Task → RaceGOW: View once (choose part)
+```
+
+or:
+
+```bash
+.venv/bin/python scripts/view.py 5way
+```
+
+The repository also includes `.vscode/launch.json`, so `F5` / Run and Debug can
+launch either a one-shot viewer or the live watcher with a selectable part.
+
+## First: fit calibration
+
+Build everything:
+
+```bash
+python scripts/build.py --preview
+```
+
+Then print `build/fit_tests.stl`. The coupons cover these diametral clearances:
+
+```text
+0.20 / 0.30 / 0.40 / 0.50 / 0.60 mm
+```
+
+Choose the fit you want and update this value in `src/racegow/config.py`:
+
+```python
+diametral_clearance: float = 0.40
+```
+
+## Production build
+
+Geometry validation only:
+
+```bash
+python scripts/build.py --check
+```
+
+Tests:
+
+```bash
+python -m pytest
+```
+
+Export required RaceGOW parts as STL + STEP:
+
+```bash
+python scripts/build.py
+```
+
+Also export the optional cross and a STEP preview of the complete connector set:
+
+```bash
+python scripts/build.py --with-cross --preview
+```
+
+Generate only BOM/cut-list/manufacturing files, without importing build123d:
+
+```bash
+python scripts/build.py --manufacturing-only
+```
+
+## Generated manufacturing files
+
+`build/` contains:
+
+- `MANUFACTURING.md` — human-readable plan
+- `BOM.csv` — Bambu Studio object quantities
+- `CUT_LIST.csv` — one row per stock pipe
+- `plan.json` — machine-readable derived dimensions
+- `config_snapshot.json` — exact input configuration used
+- `*.stl` — slicer files after a CAD build
+- `*.step` — editable CAD/BREP files after a CAD build
+
+For Bambu Studio, import each connector STL **once** and set the quantity according to `BOM.csv`. This keeps the CAD repository independent of a particular build plate layout.
+
+## Changing gate size
+
+To use a fixed CTC instead of automatic stock optimization:
+
+```python
+optimize_gate_for_stock: bool = False
+gate_ctc_manual: float = 660.0
+```
+
+At 660 mm CTC with the default 25 mm stop geometry, the PVC pieces become 635 mm long.
+
+## VS Code tasks included
+
+- `RaceGOW: Setup .venv` — create/update the local Python environment
+- `RaceGOW: Live view (choose part)` — rebuild the selected model on save
+- `RaceGOW: View once (choose part)` — send one model to OCP CAD Viewer
+- `RaceGOW: Run tests` — run pytest
+- `RaceGOW: Check build123d geometry` — validate CAD geometry
+- `RaceGOW: Build STL + STEP` — default `Ctrl+Shift+B` production build
+
+The `parts/*.py` files remain deliberately tiny wrappers. Shared geometry stays
+in `src/racegow/`, so Codex changes remain easy to review and test.

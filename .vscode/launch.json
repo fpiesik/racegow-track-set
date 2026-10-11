@@ -1,0 +1,32 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "RaceGOW: View connector",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/view.py",
+      "args": ["${input:racegowPart}"],
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "RaceGOW: Live viewer",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/live_view.py",
+      "args": ["${input:racegowPart}"],
+      "console": "integratedTerminal",
+      "justMyCode": true
+    }
+  ],
+  "inputs": [
+    {
+      "id": "racegowPart",
+      "type": "pickString",
+      "description": "RaceGOW part to show",
+      "options": ["5way", "4way", "tee", "elbow", "cross", "fit_tests"],
+      "default": "5way"
+    }
+  ]
+}

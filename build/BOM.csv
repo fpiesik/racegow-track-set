@@ -1,0 +1,5 @@
+part,quantity,stl,step
+elbow,4,elbow.stl,elbow.step
+tee,6,tee.stl,tee.step
+4way,6,4way.stl,4way.step
+5way,2,5way.stl,5way.step

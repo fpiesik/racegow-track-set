@@ -1,0 +1,31 @@
+{
+  "bed_flat": 0.8,
+  "boolean_overlap": 0.2,
+  "cut_kerf": 2.0,
+  "diametral_clearance": 0.4,
+  "fit_base_thickness": 3.0,
+  "fit_clearances": [
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6
+  ],
+  "fit_spacing": 40.0,
+  "fit_test_depth": 15.0,
+  "gate_ctc_manual": 625.0,
+  "lead_in_depth": 2.0,
+  "lead_in_extra_diameter": 1.0,
+  "optimize_gate_for_stock": false,
+  "pipe_od": 25.0,
+  "pipe_stop_offset_override": null,
+  "preview_spacing_x": 115.0,
+  "preview_spacing_y": 115.0,
+  "socket_depth": 26.0,
+  "stl_angular_tolerance": 0.1,
+  "stl_tolerance": 0.03,
+  "stock_length": 2000.0,
+  "stock_target_pieces": 3,
+  "track_sections_required": 20,
+  "wall_thickness": 2
+}

@@ -1,0 +1,8 @@
+build123d==0.13.0
+
+[dev]
+pytest>=8.0
+
+[viewer]
+ocp-vscode<4.2,>=4.1
+watchfiles<2,>=1.0
