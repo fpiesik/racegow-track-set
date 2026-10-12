@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from math import ceil, floor
+from math import ceil, floor, isfinite
 
 INCH = 25.4
 RACEGOW_MIN_CTC = 24 * INCH
@@ -33,12 +33,14 @@ class TrackConfig:
 
     # PVC / connector fit
     pipe_od: float = 25.0
-    diametral_clearance: float = 0.40
+    diametral_clearanceXY: float = 0.40  # Horizontal ports: xp, xn, yp, yn
+    diametral_clearanceZ: float = 0.30  # Vertical ports: zp, zn
     socket_depth: float = 26.0
     wall_thickness: float = 2
     pipe_stop_offset_override: float | None = None
 
     # Printable details
+    junction_fillet_radius: float = 2.0
     lead_in_depth: float = 2.0
     lead_in_extra_diameter: float = 1.0
     bed_flat: float = 0.8
@@ -71,11 +73,22 @@ class TrackConfig:
         )
 
     @property
+    def socket_id_xy(self) -> float:
+        return self.pipe_od + self.diametral_clearanceXY
+
+    @property
+    def socket_id_z(self) -> float:
+        return self.pipe_od + self.diametral_clearanceZ
+
+    @property
     def socket_id(self) -> float:
-        return self.pipe_od + self.diametral_clearance
+        """Largest bore diameter, used to size the shared outer body."""
+        return max(self.socket_id_xy, self.socket_id_z)
 
     @property
     def socket_od(self) -> float:
+        # Equal arm radii retain robust fillets and at least wall_thickness
+        # around either bore; the smaller bore has a slightly thicker wall.
         return self.socket_id + 2 * self.wall_thickness
 
     @property
@@ -145,8 +158,14 @@ class TrackConfig:
             raise ValueError("pipe_od must be positive")
         if self.socket_depth <= 0 or self.wall_thickness <= 0:
             raise ValueError("socket_depth and wall_thickness must be positive")
-        if self.diametral_clearance < 0:
-            raise ValueError("diametral_clearance must not be negative")
+        for name in ("diametral_clearanceXY", "diametral_clearanceZ"):
+            value = getattr(self, name)
+            if not isfinite(value) or value < 0:
+                raise ValueError(f"{name} must be finite and non-negative")
+        if not 0 <= self.junction_fillet_radius < self.socket_od / 2:
+            raise ValueError(
+                "junction_fillet_radius must be >= 0 and smaller than socket radius"
+            )
         if self.lead_in_depth <= 0 or self.lead_in_depth > self.socket_depth:
             raise ValueError("lead_in_depth must be > 0 and <= socket_depth")
         if self.bed_flat < 0 or self.bed_flat >= self.socket_od / 2:

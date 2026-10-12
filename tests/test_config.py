@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import math
 
+import pytest
+
 from racegow.config import CONFIG, RACEGOW_MIN_CTC, TRACK_BOM, TrackConfig
 
 
@@ -9,12 +11,34 @@ def test_default_config_valid() -> None:
     CONFIG.validate()
 
 
+def test_separate_clearances_and_minimum_wall() -> None:
+    cfg = TrackConfig(diametral_clearanceXY=0.2, diametral_clearanceZ=0.8)
+    cfg.validate()
+    assert cfg.socket_id_xy == pytest.approx(25.2)
+    assert cfg.socket_id_z == pytest.approx(25.8)
+    assert (cfg.socket_od - cfg.socket_id_xy) / 2 >= cfg.wall_thickness
+    assert (cfg.socket_od - cfg.socket_id_z) / 2 >= cfg.wall_thickness
+
+
+@pytest.mark.parametrize("name", ["diametral_clearanceXY", "diametral_clearanceZ"])
+@pytest.mark.parametrize("value", [-0.1, math.nan, math.inf])
+def test_invalid_clearances_are_rejected(name: str, value: float) -> None:
+    with pytest.raises(ValueError, match=name):
+        TrackConfig(**{name: value}).validate()
+
+
+@pytest.mark.parametrize("radius", [-1.0, 100.0, math.nan])
+def test_invalid_junction_fillet_radius_is_rejected(radius: float) -> None:
+    with pytest.raises(ValueError, match="junction_fillet_radius"):
+        TrackConfig(junction_fillet_radius=radius).validate()
+
+
 def test_racegow_minimum_is_24_inch_ctc() -> None:
     assert math.isclose(RACEGOW_MIN_CTC, 609.6)
 
 
-def test_stock_optimized_default() -> None:
-    cfg = TrackConfig()
+def test_stock_optimized_configuration() -> None:
+    cfg = TrackConfig(optimize_gate_for_stock=True)
     assert math.isclose(cfg.gate_ctc, 690.3333333333334)
     assert math.isclose(cfg.pipe_cut_length, 665.3333333333334)
     assert cfg.pieces_per_stock == 3

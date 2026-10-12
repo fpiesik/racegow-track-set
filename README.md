@@ -50,6 +50,13 @@ cross : -X +X -Y +Y
 5way  : -X +X -Y +Y +Z
 ```
 
+Connector arms meet in a filleted junction without a spherical center bulge.
+`junction_fillet_radius` in `TrackConfig` controls the exterior blends (default:
+2 mm; 0 disables them). The elbow's rear corner is rounded as well. Fillets are
+applied before the socket bores and bed flat, preserving the pipe stops,
+socket dimensions, lead-in taper, and flat print surface. If a larger radius
+cannot be built for a topology, reduce it; the build reports the affected ports.
+
 ## Why this structure is useful with Codex
 
 ```text
@@ -167,8 +174,15 @@ Then print `build/fit_tests.stl`. The coupons cover these diametral clearances:
 Choose the fit you want and update this value in `src/racegow/config.py`:
 
 ```python
-diametral_clearance: float = 0.40
+diametral_clearanceXY: float = 0.40  # Horizontal ports (xp, xn, yp, yn)
+diametral_clearanceZ: float = 0.40   # Vertical ports (zp, zn)
 ```
+
+These values independently set the bore diameter and lead-in for each port
+orientation. The common exterior diameter uses the larger clearance so both
+orientations retain at least the configured wall thickness before the lead-in.
+The fit coupons stand vertically and directly calibrate the Z clearance; check
+a horizontal connector socket in its print orientation to tune XY clearance.
 
 ## Production build
 

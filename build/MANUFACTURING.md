@@ -18,10 +18,13 @@
 ## Connector fit
 
 - PVC OD: **25.00 mm**
-- Socket ID: **25.40 mm**
+- Socket ID XY (horizontal ports): **25.40 mm**
+- Socket ID Z (vertical ports): **25.30 mm**
 - Socket OD: **29.40 mm**
 - Socket depth: **26.00 mm**
-- Diametral clearance: **0.40 mm**
+- Diametral clearance XY: **0.40 mm**
+- Diametral clearance Z: **0.30 mm**
+- Minimum wall thickness before lead-in: **2.00 mm**
 
 ## Connector BOM
 
@@ -35,7 +38,7 @@
 ## Recommended production order
 
 1. Print `fit_tests.stl` and choose the best real-world PVC clearance.
-2. Update `diametral_clearance` in `src/racegow/config.py` if necessary.
+2. Update `diametral_clearanceXY` and `diametral_clearanceZ` in `src/racegow/config.py` for horizontal and vertical ports, respectively.
 3. Run `python scripts/build.py --check`.
 4. Run `python scripts/build.py` to export production STL + STEP files.
 5. Import each STL once into Bambu Studio and set its quantity from the BOM.

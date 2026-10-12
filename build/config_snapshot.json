@@ -2,7 +2,8 @@
   "bed_flat": 0.8,
   "boolean_overlap": 0.2,
   "cut_kerf": 2.0,
-  "diametral_clearance": 0.4,
+  "diametral_clearanceXY": 0.4,
+  "diametral_clearanceZ": 0.3,
   "fit_base_thickness": 3.0,
   "fit_clearances": [
     0.2,
@@ -14,6 +15,7 @@
   "fit_spacing": 40.0,
   "fit_test_depth": 15.0,
   "gate_ctc_manual": 625.0,
+  "junction_fillet_radius": 2.0,
   "lead_in_depth": 2.0,
   "lead_in_extra_diameter": 1.0,
   "optimize_gate_for_stock": false,

@@ -6,9 +6,12 @@
     "tee": 6
   },
   "connector": {
-    "diametral_clearance_mm": 0.4,
+    "diametral_clearance_xy_mm": 0.4,
+    "diametral_clearance_z_mm": 0.3,
     "socket_depth_mm": 26.0,
     "socket_id_mm": 25.4,
+    "socket_id_xy_mm": 25.4,
+    "socket_id_z_mm": 25.3,
     "socket_od_mm": 29.4,
     "wall_thickness_mm": 2
   },
