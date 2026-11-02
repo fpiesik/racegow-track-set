@@ -13,7 +13,7 @@
 // "set_preview" = complete track set overview
 // "fit_array"   = multiple fit test pieces
 
-mode = "set_preview";
+mode = "all_parts";
 
 // "elbow"
 // "tee"
